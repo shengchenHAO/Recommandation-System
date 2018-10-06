@@ -30,12 +30,6 @@ R<-as.matrix(g)
 #   realRatingMatrix is a recommenderlab sparse-matrix like data-structure
 r <- as(R, "realRatingMatrix")
 
-
-
-
-# I can turn it into data-frame
-head(as(r, "data.frame"))
-
 # normalize the rating matrix
 r_m <- normalize(r)
 
@@ -94,9 +88,6 @@ rec_list<-as(recom,"list")
 ########## Create submission File from model #######################
 # Read test file
 test<-read.csv("test_v2.csv",header=TRUE)
-
-# Get ratings list
-rec_list<-as(recom,"list")
 
 ratings<-NULL
 # For all lines in test file, one by one
