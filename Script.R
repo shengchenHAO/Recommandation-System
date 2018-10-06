@@ -1,13 +1,19 @@
 library(recommenderlab)
 library(reshape2)
+library(Matrix)
 
 
 #train_data = stream_in(file("reviews.training.json"))
 #save(train_data, file = "Train.RData")
 
 load("Train.RData")
-train_data = dplyr::select(train_data, reviewerID, asin, overall)
+train_data = dplyr::select(train_data, reviewerID, asin, overall) 
+write.csv(train_data, file = "training.csv")
+######################
+train_data = read.csv(file = "training.csv", header = T, sep = ",") 
+train_data$X = NULL
 test = read.csv(file="reviews.test.unlabeled.csv", header=TRUE, sep=",")
+
 
 tr<-read.csv("train_v2.csv",header=TRUE)
 tr<-tr[,-c(1)]
@@ -26,7 +32,7 @@ R<-as.matrix(g)
 
 # Convert R into realRatingMatrix data structure
 #   realRatingMatrix is a recommenderlab sparse-matrix like data-structure
-r <- as(R, "realRatingMatrix")
+r <- as(data.sparse, "realRatingMatrix")
 # normalize the rating matrix
 r_m <- normalize(r)
 
@@ -72,5 +78,12 @@ length(ratings)
 tx<-cbind(test[,1],round(ratings))
 
 save.image("output.RData")
+
+# test for sparse matrix 
+data.sparse = sparseMatrix(as.integer(train_data$user), as.integer(train_data$movie), x = train_data$rating)
+
+colnames(data.sparse) = levels(train_data$movie)
+rownames(data.sparse) = levels(train_data$user)
+
 
 
