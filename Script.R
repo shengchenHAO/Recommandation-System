@@ -5,11 +5,10 @@ library(Matrix)
 
 #train_data = stream_in(file("reviews.training.json"))
 #save(train_data, file = "Train.RData")
-
-load("Train.RData")
-train_data = dplyr::select(train_data, reviewerID, asin, overall) 
-write.csv(train_data, file = "training.csv")
+#train_data = dplyr::select(train_data, reviewerID, asin, overall) 
+#write.csv(train_data, file = "training.csv")
 ######################
+
 train_data = read.csv(file = "training.csv", header = T, sep = ",") 
 train_data$X = NULL
 test = read.csv(file="reviews.test.unlabeled.csv", header=TRUE, sep=",")
@@ -18,30 +17,32 @@ test = read.csv(file="reviews.test.unlabeled.csv", header=TRUE, sep=",")
 tr<-read.csv("train_v2.csv",header=TRUE)
 tr<-tr[,-c(1)]
 
-#train_data$helpful = NULL
-#write.csv2(train_data, file = "train.csv")
-
 colnames(train_data) = colnames(tr) 
 rm(tr) 
 gc()
-g<-acast(train_data, user ~ movie)
-# Check the class of g
+#g<-acast(train_data[1:1000,], user ~ movie)
 
-# Convert it as a matrix
-R<-as.matrix(g)
+
+
+# test for sparse matrix 
+#data.sparse = sparseMatrix(as.integer(train_data$user), as.integer(train_data$movie), x = train_data$rating)
+#colnames(data.sparse) = levels(train_data$movie)
+#rownames(data.sparse) = levels(train_data$user)
+###############################
+rm(train_data)
 
 # Convert R into realRatingMatrix data structure
 #   realRatingMatrix is a recommenderlab sparse-matrix like data-structure
-r <- as(data.sparse, "realRatingMatrix")
-# normalize the rating matrix
-r_m <- normalize(r)
+#r <- as(data.sparse, "realRatingMatrix")
+#r_b <- binarize(r, minRating=1)
 
-# Can also turn the matrix into a 0-1 binary matrix
-r_b <- binarize(r, minRating=1)
+R<-as.matrix(g1)
+rm(g1)
+r <- as(R, "realRatingMatrix")
 
 rec=Recommender(r[1:nrow(r)],method="POPULAR")
 
-recom <- predict(rec, r[1:nrow(r)], type="ratings") 
+recom <- predict(rec, r[1:nrow(r)], type="ratings")
 rec_list<-as(recom,"list")
 
 ratings<-NULL
@@ -79,11 +80,6 @@ tx<-cbind(test[,1],round(ratings))
 
 save.image("output.RData")
 
-# test for sparse matrix 
-data.sparse = sparseMatrix(as.integer(train_data$user), as.integer(train_data$movie), x = train_data$rating)
-
-colnames(data.sparse) = levels(train_data$movie)
-rownames(data.sparse) = levels(train_data$user)
 
 
 
